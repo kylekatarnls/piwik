@@ -12,6 +12,7 @@ use Exception;
 use Piwik\Common;
 use Piwik\Db;
 use Piwik\DbHelper;
+use Piwik\Piwik;
 use Piwik\Version;
 
 /**
@@ -54,16 +55,21 @@ class SegmentEditor extends \Piwik\Plugin
 
     public function getKnownSegmentsToArchiveAllSites(&$segments)
     {
-        $segmentsToAutoArchive = API::getInstance()->getAll($idSite = false, $returnOnlyAutoArchived = true);
-        foreach ($segmentsToAutoArchive as $segment) {
-            $segments[] = $segment['definition'];
+        if (!Piwik::hasUserSuperUserAccess()) {
+            return;
         }
+
+        $this->getKnownSegmentsToArchiveForSite($segments, $idSite = false);
     }
 
     public function getKnownSegmentsToArchiveForSite(&$segments, $idSite)
     {
-        $segmentToAutoArchive = API::getInstance()->getAll($idSite, $returnOnlyAutoArchived = true);
+        if (!Piwik::hasUserSuperUserAccess()) {
+            return;
+        }
 
+        $model = new Model();
+        $segmentToAutoArchive = $model->getSegmentsToAutoArchive($idSite);
         foreach ($segmentToAutoArchive as $segmentInfo) {
             $segments[] = $segmentInfo['definition'];
         }

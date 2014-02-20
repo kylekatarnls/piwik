@@ -7,8 +7,8 @@
  */
 namespace Piwik;
 
-use Piwik\CliMulti\Process;
 use Piwik\CliMulti\Output;
+use Piwik\CliMulti\Process;
 
 /**
  * Class CliMulti.
@@ -90,12 +90,12 @@ class CliMulti {
         }
     }
 
-    private function buildCommand($query, $outputFile)
+    private function buildCommand($hostname, $query, $outputFile)
     {
         $bin = $this->findPhpBinary();
 
-        return sprintf('%s -q %s/console climulti:request %s > %s 2>&1 &',
-                       $bin, PIWIK_INCLUDE_PATH, escapeshellarg($query), $outputFile);
+        return sprintf('%s -q %s/console climulti:request --piwik-domain=%s %s > %s 2>&1 &',
+                       $bin, PIWIK_INCLUDE_PATH, escapeshellarg($hostname), escapeshellarg($query), $outputFile);
     }
 
     private function getResponse()
@@ -194,16 +194,22 @@ class CliMulti {
             return PHP_BINARY;
         }
 
-        $bin = shell_exec('which php');
+        $bin = '';
+
+        if (!empty($_SERVER['_']) && Common::isPhpCliMode()) {
+            $bin = $this->getPhpCommandIfValid($_SERVER['_']);
+        }
+
+        if (empty($bin) && !empty($_SERVER['argv'][0]) && Common::isPhpCliMode()) {
+            $bin = $this->getPhpCommandIfValid($_SERVER['argv'][0]);
+        }
+
+        if (empty($bin)) {
+            $bin = shell_exec('which php');
+        }
 
         if (empty($bin)) {
             $bin = shell_exec('which php5');
-        }
-
-        if (empty($bin) && defined('PHP_BINDIR') && Common::isPhpCliMode() && !empty($_SERVER['_']) && is_executable($_SERVER['_'])) {
-            if (0 === strpos($_SERVER['_'], PHP_BINDIR)) {
-                $bin = $_SERVER['_'];
-            }
         }
 
         if (!empty($bin)) {
@@ -215,10 +221,12 @@ class CliMulti {
     {
         $this->processes[] = new Process($cmdId);
 
-        $url     = $this->appendTestmodeParamToUrlIfNeeded($url);
-        $query   = Url::getQueryFromUrl($url, array('pid' => $cmdId));
-        $command = $this->buildCommand($query, $output->getPathToFile());
+        $url  = $this->appendTestmodeParamToUrlIfNeeded($url);
+        $query   = UrlHelper::getQueryFromUrl($url, array('pid' => $cmdId));
+        $hostname = UrlHelper::getHostFromUrl($url);
+        $command = $this->buildCommand($hostname, $query, $output->getPathToFile());
 
+        Log::debug($command);
         shell_exec($command);
     }
 
@@ -251,5 +259,14 @@ class CliMulti {
         }
 
         return $url;
+    }
+
+    private function getPhpCommandIfValid($path)
+    {
+        if (!empty($path) && is_executable($path)) {
+            if (0 === strpos($path, PHP_BINDIR) && false === strpos($path, 'phpunit')) {
+                return $path;
+            }
+        }
     }
 }

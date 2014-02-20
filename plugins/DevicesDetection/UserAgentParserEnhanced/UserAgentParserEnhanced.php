@@ -124,6 +124,7 @@ class UserAgentParserEnhanced
         'PO' => 'phoneOne',
         'PT' => 'Pantech',
         'PP' => 'PolyPad',
+        'PR' => 'Prestigio',
         'QT' => 'Qtek',
         'RM' => 'RIM',
         'RO' => 'Rover',
@@ -155,6 +156,7 @@ class UserAgentParserEnhanced
         'TT' => 'TechnoTrend',
         'TV' => 'TVC',
         'TX' => 'TechniSat',
+        'TZ' => 'teXet',
         'UT' => 'UTStarcom',
         'VD' => 'Videocon',
         'VE' => 'Vertu',
@@ -167,6 +169,7 @@ class UserAgentParserEnhanced
         'WB' => 'Web TV',
         'WE' => 'WellcoM',
         'WO' => 'Wonu',
+        'WX' => 'Woxter',
         'XI' => 'Xiaomi',
         'XX' => 'Unknown',
         'YU' => 'Yuandao',
@@ -198,6 +201,7 @@ class UserAgentParserEnhanced
         'HP-UX'                => 'HPX',
         'Haiku OS'             => 'HAI',
         'IRIX'                 => 'IRI',
+        'Inferno'              => 'INF',
         'Knoppix'              => 'KNO',
         'Kubuntu'              => 'KBT',
         'Linux'                => 'LIN',
@@ -217,6 +221,8 @@ class UserAgentParserEnhanced
         'Presto'               => 'PRS',
         'Puppy'                => 'PPY',
         'Red Hat'              => 'RHT',
+        'RISC OS'              => 'ROS',
+        'Sabayon'              => 'SAB',
         'SUSE'                 => 'SSE',
         'Sailfish OS'          => 'SAF',
         'Slackware'            => 'SLW',
@@ -270,13 +276,14 @@ class UserAgentParserEnhanced
         'Google TV'             => array('GTV'),
         'IBM'                   => array('OS2'),
         'iOS'                   => array('IOS'),
-        'Linux'                 => array('LIN', 'ARL', 'DEB', 'KNO', 'MIN', 'UBT', 'KBT', 'XBT', 'LBT', 'FED', 'RHT', 'MDR', 'GNT', 'SLW', 'SSE', 'PPY', 'CES', 'BTR', 'YNS', 'PRS', 'SAF'),
+        'RISC OS'               => array('ROS'),
+        'Linux'                 => array('LIN', 'ARL', 'DEB', 'KNO', 'MIN', 'UBT', 'KBT', 'XBT', 'LBT', 'FED', 'RHT', 'MDR', 'GNT', 'SAB', 'SLW', 'SSE', 'PPY', 'CES', 'BTR', 'YNS', 'PRS', 'SAF'),
         'Mac'                   => array('MAC'),
         'Mobile Gaming Console' => array('PSP', 'NDS', 'XBX'),
         'Other Mobile'          => array('WOS', 'POS', 'QNX', 'SBA', 'TIZ', 'SMG'),
         'Simulator'             => array('TKT', 'WWP'),
         'Symbian'               => array('SYM', 'SYS', 'SY3', 'S60', 'S40'),
-        'Unix'                  => array('SOS', 'AIX', 'HPX', 'BSD', 'NBS', 'OBS', 'DFB', 'SYL', 'IRI', 'T64'),
+        'Unix'                  => array('SOS', 'AIX', 'HPX', 'BSD', 'NBS', 'OBS', 'DFB', 'SYL', 'IRI', 'T64', 'INF'),
         'WebTV'                 => array('WTV'),
         'Windows'               => array('WI7', 'WI8', 'WVI', 'WS3', 'WXP', 'W2K', 'WNT', 'WME', 'W98', 'W95', 'WRT', 'W31', 'WIN'),
         'Windows Mobile'        => array('WPH', 'WMO', 'WCE')
@@ -310,6 +317,7 @@ class UserAgentParserEnhanced
         'BX' => 'BrowseX',
         'CA' => 'Camino',
         'CD' => 'Comodo Dragon',
+        'CX' => 'Charon',
         'CF' => 'Chrome Frame',
         'CH' => 'Chrome',
         'CI' => 'Chrome Mobile iOS',
@@ -371,11 +379,13 @@ class UserAgentParserEnhanced
         'OM' => 'Opera Mobile',
         'OP' => 'Opera',
         'ON' => 'Opera Next',
+        'OR' => 'Oregano',
         'OV' => 'Openwave Mobile Browser',
         'OW' => 'OmniWeb',
         'PL' => 'Palm Blazer',
         'PM' => 'Pale Moon',
         'PR' => 'Palm Pre',
+        'PU' => 'Puffin',
         'PW' => 'Palm WebPro',
         'PX' => 'Phoenix',
         'PO' => 'Polaris',
@@ -409,6 +419,10 @@ class UserAgentParserEnhanced
     protected $brand = '';
     protected $model = '';
     protected $debug = false;
+
+    /**
+     * @var \Piwik\CacheFile
+     */
     protected $cache = null;
 
     public function __construct($userAgent)
@@ -419,12 +433,8 @@ class UserAgentParserEnhanced
     protected function getOsRegexes()
     {
         static $regexOs;
-        if (empty($regexOs)) {
-            $regexOs = $this->getParsedYmlFromCache('os');
-        }
-        if (empty($regexOs)) {
-            $regexOs = Spyc::YAMLLoad(dirname(__FILE__) . self::$regexesDir . self::$osRegexesFile);
-            $this->saveParsedYmlInCache('os', $regexOs);
+        if(empty($regexOs)) {
+            $regexOs = $this->getRegexList('os', self::$osRegexesFile);
         }
         return $regexOs;
     }
@@ -433,11 +443,7 @@ class UserAgentParserEnhanced
     {
         static $regexBrowser;
         if (empty($regexBrowser)) {
-            $regexBrowser = $this->getParsedYmlFromCache('browser');
-        }
-        if (empty($regexBrowser)) {
-            $regexBrowser = Spyc::YAMLLoad(dirname(__FILE__) . self::$regexesDir . self::$browserRegexesFile);
-            $this->saveParsedYmlInCache('browser', $regexBrowser);
+            $regexBrowser = $this->getRegexList('browser', self::$browserRegexesFile);
         }
         return $regexBrowser;
     }
@@ -446,11 +452,7 @@ class UserAgentParserEnhanced
     {
         static $regexMobile;
         if (empty($regexMobile)) {
-            $regexMobile = $this->getParsedYmlFromCache('mobile');
-        }
-        if (empty($regexMobile)) {
-            $regexMobile = Spyc::YAMLLoad(dirname(__FILE__) . self::$regexesDir . self::$mobileRegexesFile);
-            $this->saveParsedYmlInCache('mobile', $regexMobile);
+            $regexMobile = $this->getRegexList('mobile', self::$mobileRegexesFile);
         }
         return $regexMobile;
     }
@@ -459,11 +461,7 @@ class UserAgentParserEnhanced
     {
         static $regexTvs;
         if (empty($regexTvs)) {
-            $regexTvs = $this->getParsedYmlFromCache('tv');
-        }
-        if (empty($regexTvs)) {
-            $regexTvs = Spyc::YAMLLoad(dirname(__FILE__) . self::$regexesDir . self::$televisionRegexesFile);
-            $this->saveParsedYmlInCache('tv', $regexTvs);
+            $regexTvs = $this->getRegexList('tv', self::$televisionRegexesFile);
         }
         return $regexTvs;
     }
@@ -933,6 +931,16 @@ class UserAgentParserEnhanced
             'browser_family' => $browserFamily !== false ? $browserFamily : 'Unknown',
         );
         return $processed;
+    }
+
+    protected function getRegexList($type, $regexesFile)
+    {
+        $regexList = $this->getParsedYmlFromCache($type);
+        if (empty($regexList)) {
+            $regexList = Spyc::YAMLLoad(dirname(__FILE__) . self::$regexesDir . $regexesFile);
+            $this->saveParsedYmlInCache($type, $regexList);
+        }
+        return $regexList;
     }
 
 }

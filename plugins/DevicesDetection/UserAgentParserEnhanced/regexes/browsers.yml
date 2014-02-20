@@ -183,6 +183,11 @@
   name: 'Maxthon'
   version: ''
 
+#Puffin
+- regex: 'Puffin(?:/(\d+\.\d+))?'
+  name: 'Puffin'
+  version: '$1'
+
 #Iron
 - regex: 'Iron(?:/(\d+\.\d+))?'
   name: 'Iron'
@@ -298,7 +303,12 @@
 - regex: 'BrowseX \((\d+\.\d+)'
   name: 'BrowseX'
   version: '$1'
-  
+
+#Charon
+- regex: 'Charon(?:[/ ](\d+\.\d+))?'
+  name: 'Charon'
+  version: '$1'
+
 #Cheshire
 - regex: 'Cheshire(?:/(\d+\.\d+))?'
   name: 'Cheshire'
@@ -359,6 +369,11 @@
   name: 'Sleipnir'
   version: '$1'
 
+#Lunascape
+- regex: 'Lunascape(?:[/ ](\d+\.\d+))?'
+  name: 'Lunascape'
+  version: '$1'
+
 #Internet Explorer
 - regex: 'IEMobile[ /](\d+\.\d+)'
   name: 'IE Mobile'
@@ -413,11 +428,6 @@
 #Links
 - regex: 'Links(?: \((\d+\.\d+))?'
   name: 'Links'
-  version: '$1'
-
-#Lunascape
-- regex: 'Lunascape(?:/(\d+\.\d+))?'
-  name: 'Lunascape'
   version: '$1'
 
 #Openwave Mobile Browser
@@ -480,12 +490,17 @@
 - regex: 'Obigo|Teleca'
   name: 'Obigo'
   version: ''
-  
+
+#Oregano
+- regex: 'Oregano(?:[ /](\d+\.\d+))?'
+  name: 'Oregano'
+  version: '$1'
+
 #Polaris
 - regex: '(?:Polaris|Embider)(?:/(\d+\.\d+))?'
   name: 'Polaris'
   version: '$1'
-  
+
 #Snowshoe
 - regex: 'Snowshoe(?:/(\d+\.\d+))?'
   name: 'Snowshoe'

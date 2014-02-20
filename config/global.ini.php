@@ -76,9 +76,8 @@ enable_sql_profiler = 0
 ; this is useful for Piwik developers as an easy way to create data in their local Piwik
 track_visits_inside_piwik_ui = 0
 
-; if set to 1, javascript files will be included individually and the css will be regenerated from the less
-; files when they change
-; this option must be set to 1 when adding, removing or modifying javascript and less files
+; if set to 1, javascript files will be included individually and neither merged nor minified.
+; this option must be set to 1 when adding, removing or modifying javascript files
 disable_merged_assets = 0
 
 ; If set to 1, all requests to piwik.php will be forced to be 'new visitors'
@@ -135,6 +134,13 @@ anonymous_user_enable_use_segments_API = 1
 ; You can force the browser archiving to be disabled in most cases by setting this setting to 1
 ; The only time that the browser will still trigger archiving is when requesting a custom date range that is not pre-processed yet
 browser_archiving_disabled_enforce = 0
+
+; By default, users can create Segments which are to be processed in Real-time.
+; Setting this to 0 will force all newly created Custom Segments to be "Pre-processed (faster, requires archive.php cron)"
+; This can be useful if you want to prevent users from adding much load on the server.
+; Note: any existing Segment set to "processed in Real time", will still be set to Real-time.
+;       this will only affect custom segments added or modified after this setting is changed.
+enable_create_realtime_segments = 1
 
 ; this action name is used when the URL ends with a slash /
 ; it is useful to have an actual string to write in the UI
